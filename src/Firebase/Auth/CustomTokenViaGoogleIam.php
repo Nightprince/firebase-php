@@ -26,10 +26,14 @@ class CustomTokenViaGoogleIam implements Generator
     /** @var ClientInterface */
     private $client;
 
-    public function __construct(string $clientEmail, ClientInterface $client)
+    /** @var TenantId|null */
+    private $tenantId;
+
+    public function __construct(string $clientEmail, ClientInterface $client, ?TenantId $tenantId = null)
     {
         $this->clientEmail = $clientEmail;
         $this->client = $client;
+        $this->tenantId = $tenantId;
     }
 
     /**
@@ -52,6 +56,10 @@ class CustomTokenViaGoogleIam implements Generator
             ->issuedAt($now)
             ->expiresAt($expiration)
             ->permittedFor('https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit');
+
+        if ($this->tenantId) {
+            $builder->withClaim('tenantId', $this->tenantId->toString());
+        }
 
         if (!empty($claims)) {
             $builder = $builder->withClaim('claims', $claims);
