@@ -28,6 +28,7 @@ use Kreait\Firebase\Auth\SignInWithEmailAndOobCode;
 use Kreait\Firebase\Auth\SignInWithEmailAndPassword;
 use Kreait\Firebase\Auth\SignInWithIdpCredentials;
 use Kreait\Firebase\Auth\SignInWithRefreshToken;
+use Kreait\Firebase\Auth\TenantId;
 use Kreait\Firebase\Auth\UserRecord;
 use Kreait\Firebase\Exception\Auth\ExpiredOobCode;
 use Kreait\Firebase\Exception\Auth\InvalidOobCode;
@@ -65,8 +66,11 @@ class Auth
     /** @var SignInHandler */
     private $signInHandler;
 
+    /** @var TenantId|null */
+    private $tenantId;
+
     /**
-     * @param iterable<ApiClient|TokenGenerator|Verifier|SignInHandler>|ApiClient|TokenGenerator|Verifier|SignInHandler ...$x
+     * @param iterable<ApiClient|TokenGenerator|Verifier|SignInHandler>|ApiClient|TokenGenerator|Verifier|SignInHandler|TenantId|null ...$x
      *
      * @internal
      */
@@ -81,6 +85,8 @@ class Auth
                 $this->idTokenVerifier = $arg;
             } elseif ($arg instanceof SignInHandler) {
                 $this->signInHandler = $arg;
+            } elseif ($arg instanceof TenantId) {
+                $this->tenantId = $arg;
             }
         }
     }
@@ -806,7 +812,13 @@ class Auth
      */
     public function signInAnonymously(): SignInResult
     {
-        $result = $this->signInHandler->handle(SignInAnonymously::new());
+        $operation = SignInAnonymously::new();
+
+        if ($this->tenantId) {
+            $operation = $operation->withTenantId($this->tenantId);
+        }
+
+        $result = $this->signInHandler->handle($operation);
 
         if ($result->idToken()) {
             return $result;

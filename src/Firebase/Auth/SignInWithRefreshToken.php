@@ -9,6 +9,9 @@ final class SignInWithRefreshToken implements SignIn
     /** @var string */
     private $refreshToken;
 
+    /** @var TenantId|null */
+    private $tenantId;
+
     private function __construct()
     {
     }
@@ -21,8 +24,21 @@ final class SignInWithRefreshToken implements SignIn
         return $instance;
     }
 
+    public function withTenantId(TenantId $tenantId): self
+    {
+        $action = clone $this;
+        $action->tenantId = $tenantId;
+
+        return $action;
+    }
+
     public function refreshToken(): string
     {
         return $this->refreshToken;
+    }
+
+    public function tenantId(): ?TenantId
+    {
+        return $this->tenantId;
     }
 }

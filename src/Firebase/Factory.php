@@ -416,7 +416,7 @@ class Factory
 
         $signInHandler = new Firebase\Auth\SignIn\GuzzleHandler($http);
 
-        return new Auth($apiClient, $customTokenGenerator, $idTokenVerifier, $signInHandler);
+        return new Auth($apiClient, $customTokenGenerator, $idTokenVerifier, $signInHandler, $this->tenantId);
     }
 
     public function createCustomTokenGenerator(): Generator

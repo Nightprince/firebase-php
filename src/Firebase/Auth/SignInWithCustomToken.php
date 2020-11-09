@@ -9,6 +9,9 @@ final class SignInWithCustomToken implements SignIn
     /** @var string */
     private $customToken;
 
+    /** @var TenantId|null */
+    private $tenantId;
+
     private function __construct()
     {
     }
@@ -21,8 +24,21 @@ final class SignInWithCustomToken implements SignIn
         return $instance;
     }
 
+    public function withTenantId(TenantId $tenantId): self
+    {
+        $action = clone $this;
+        $action->tenantId = $tenantId;
+
+        return $action;
+    }
+
     public function customToken(): string
     {
         return $this->customToken;
+    }
+
+    public function tenantId(): ?TenantId
+    {
+        return $this->tenantId;
     }
 }
